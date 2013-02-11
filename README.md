@@ -41,6 +41,9 @@ it xlock should launch and your computer will be locked (you can unlock it with 
 When you re-insert your device, xlock will be stopped and you computer unlocked. Some WMs may require you 
 to move your mouse/press a key to unblank the screen.
 
+You do not need to mount the device fully, it should be able to read the required information when you 
+plug it in
+
 Run
 
   usblock -h
