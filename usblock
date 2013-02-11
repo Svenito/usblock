@@ -128,7 +128,7 @@ class DeviceAddedListener(object):
             return False
 
         if str(size) not in [d.size for d in self.devices]:
-            logger.debug("Invalid device (size: %s)" % str(size))
+            logger.debug("Invalid device (size: %d)" % size)
             logger.debug(self.devices)
             return False
 
