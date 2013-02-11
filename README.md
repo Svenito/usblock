@@ -1,7 +1,7 @@
 USBLock
 -------
 
-Copyright (C) 2013  Sven Steinbauer
+Copyright (C) 2013  Sven Steinbauer http://www.unlogic.co.uk
 
 USBlock is a Python script that will lock and unlock your linux box using any old USB storage device as
 a key.
