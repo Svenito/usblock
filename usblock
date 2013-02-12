@@ -184,19 +184,15 @@ class DeviceAddedListener(object):
                 f.close()
                 os.chmod(self.configFile, 0600)
             except:
-                return -1
+                return
         else:
-            try:
-                self.setValues()
-            except ConfigParser.NoSectionError:
-                self.config.add_section("main")
+            self.setValues()
 
     def setValues(self):
         """
         From the config, set list of known devices
         """
-        num_devices = len(self.config.sections())
-        if num_devices == 0:
+        if len(self.config.sections()) == 0:
             logger.debug("No devices")
             return
 
