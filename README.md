@@ -23,18 +23,18 @@ Before you launch USBLock for the first time you need to add your device to the 
 devices.
 Run 
 
-  usblock -a
+    usblock -a
 
 and follow the onscreen prompts. When done you can confirm that the device was added by listing the known
 devices with
 
-  usblock -l
+    usblock -l
 
 When you are satisfied run it with
 
-  usblock
+    usblock
 
-You can optionally set a logging level with -d[1-5] which will log to ~/.config/usblock/usblock.log
+You can optionally set a logging level with `-d[1-5]` which will log to `~/.config/usblock/usblock.log`
 
 Once running you will need to insert or re-insert your USB device you registered earlier. Once you remove
 it xlock should launch and your computer will be locked (you can unlock it with your usual password too).
@@ -46,7 +46,7 @@ plug it in
 
 Run
 
-  usblock -h
+    usblock -h
 
 to see all available options.
 
