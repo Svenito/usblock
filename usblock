@@ -278,7 +278,8 @@ class DeviceAddedListener(object):
                 continue
 
             if choice > 0 and choice <= len(self.devices):
-                if queryYesNo("You are about to remove device %d. Is this OK?" % (choice)):
+                if queryYesNo("You are about to remove device %d. Is this OK?"
+                              % (choice)):
                     del self.devices[choice - 1]
                     self.writeConfig()
             else:
@@ -364,7 +365,8 @@ def doit():
 
 
 def startListening(options):
-    fg = [n for n, v in options.__dict__.items() if (v is not None and n != "debug_level")]
+    fg = [n for n, v in options.__dict__.items()
+          if (v is not None and n != "debug_level")]
 
     to_file = False
     if len(fg) == 0:
@@ -373,7 +375,11 @@ def startListening(options):
             sys.exit(0)
         to_file = True
         fh = setupLogging(int(options.debug_level), to_file)
-        daemon = Daemonize(app="usblock", pid=PIDFILE, action=doit, keep_fds=[fh.stream.fileno()])
+
+        daemon = Daemonize(app="usblock",
+                           pid=PIDFILE,
+                           action=doit,
+                           keep_fds=[fh.stream.fileno()])
         daemon.start()
 
     setupLogging(int(options.debug_level), to_file)
