@@ -32,6 +32,7 @@ import subprocess
 import ConfigParser
 from optparse import OptionParser
 from dbus.mainloop.glib import DBusGMainLoop
+from collections import namedtuple
 
 logger = logging.getLogger("usblock")
 CONFDIR = os.path.expanduser(os.path.join('~', '.config', 'usblock'))
@@ -39,18 +40,10 @@ PIDFILE = os.path.join(CONFDIR, 'lock.pid')
 LOGFILE = os.path.join(CONFDIR, 'usblock.log')
 CONFFILE = os.path.join(CONFDIR, 'conf')
 ERRNO_FILE_EXISTS = 17
-VERSION = "0.1"
+__version__ = "0.1"
 
 
-class Device(object):
-    def __init__(self, uuid, size, label):
-        self.uuid = uuid
-        self.size = size
-        self.label = label
-
-    def __repr__(self):
-        out = "UUID: %s label: %s size: %s" % (self.uuid, self.label, self.size)
-        return out
+Device = namedtuple("Device", ["uuid", "size", "label"])
 
 
 class DeviceAddedListener(object):
@@ -176,7 +169,7 @@ class DeviceAddedListener(object):
             os.makedirs(CONFDIR)
         except OSError as e:
             if e.errno != ERRNO_FILE_EXISTS:
-                return -1  
+                return -1
 
         self.configFile = CONFFILE
 
@@ -393,7 +386,7 @@ def startListening(options):
 if __name__ == '__main__':
     usage = """%s V%s [options]\n
             Lock and unlock your desktop using a USB stick as a key
-            """ % (os.path.basename(sys.argv[0]), VERSION)
+            """ % (os.path.basename(sys.argv[0]), __version__)
     parser = OptionParser(usage=usage)
     parser.add_option("-a", "--add-device",
                       action="store_true",
