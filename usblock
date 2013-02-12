@@ -38,7 +38,7 @@ CONFDIR = os.path.expanduser(os.path.join('~', '.config', 'usblock'))
 PIDFILE = os.path.join(CONFDIR, 'lock.pid')
 LOGFILE = os.path.join(CONFDIR, 'usblock.log')
 CONFFILE = os.path.join(CONFDIR, 'conf')
-VERSION = "0.1"
+__version__ = "0.1"
 
 
 class Device(object):
@@ -392,7 +392,7 @@ def startListening(options):
 if __name__ == '__main__':
     usage = """%s V%s [options]\n
             Lock and unlock your desktop using a USB stick as a key
-            """ % (os.path.basename(sys.argv[0]), VERSION)
+            """ % (os.path.basename(sys.argv[0]), __version__)
     parser = OptionParser(usage=usage)
     parser.add_option("-a", "--add-device",
                       action="store_true",
