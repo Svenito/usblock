@@ -271,7 +271,7 @@ class DeviceAddedListener(object):
             choice = raw_input("Enter number to remove: ")
             try:
                 choice = int(choice)
-            except:
+            except ValueError:
                 print "Invalid choice."
                 continue
 
