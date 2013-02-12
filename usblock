@@ -31,7 +31,7 @@ import logging
 from daemonize import Daemonize
 import subprocess
 import ConfigParser
-from optparse import OptionParser
+from argparse import ArgumentParser
 from dbus.mainloop.glib import DBusGMainLoop
 from collections import namedtuple
 
@@ -357,12 +357,12 @@ def getRunningInstances():
 
 
 def doit():
-    DeviceAddedListener(options)
+    DeviceAddedListener(args)
 
 
 def startListening(options):
     fg = [n for n, v in options.__dict__.items()
-          if (v is not None and n != "debug_level")]
+          if (v is not False and n != "debug_level")]
 
     to_file = False
     if len(fg) == 0:
@@ -386,49 +386,50 @@ if __name__ == '__main__':
     usage = """%s V%s [options]\n
             Lock and unlock your desktop using a USB stick as a key
             """ % (os.path.basename(sys.argv[0]), __version__)
-    parser = OptionParser(usage=usage)
-    parser.add_option("-a", "--add-device",
-                      action="store_true",
-                      dest="add_device",
-                      help="Add the next aded device")
-    parser.add_option("-f", "--foreground",
-                      action="store_true",
-                      dest="foreground",
-                      help="Run in foreground")
-    parser.add_option("-l", "--list",
-                      action="store_true",
-                      dest="list_devices",
-                      help="List registered devices and exit")
-    parser.add_option("-r", "--remove",
-                      action="store_true",
-                      dest="remove_device",
-                      help="Remove a registered device")
-    parser.add_option("--stop",
-                      action="store_true",
-                      dest="stop_lock",
-                      help="Stop a running daemon")
-    parser.add_option("--pid",
-                      action="store_true",
-                      dest="pid",
-                      help="Show pid of running daemon")
-    parser.add_option("-d", "--debug",
-                      action="store",
-                      dest="debug_level",
-                      default=0,
-                      help="Set debug level")
+
+    parser = ArgumentParser(usage=usage)
+    parser.add_argument("-a", "--add-device",
+                        action="store_true",
+                        dest="add_device",
+                        help="Add the next aded device")
+    parser.add_argument("-f", "--foreground",
+                        action="store_true",
+                        dest="foreground",
+                        help="Run in foreground")
+    parser.add_argument("-l", "--list",
+                        action="store_true",
+                        dest="list_devices",
+                        help="List registered devices and exit")
+    parser.add_argument("-r", "--remove",
+                        action="store_true",
+                        dest="remove_device",
+                        help="Remove a registered device")
+    parser.add_argument("--stop",
+                        action="store_true",
+                        dest="stop_lock",
+                        help="Stop a running daemon")
+    parser.add_argument("--pid",
+                        action="store_true",
+                        dest="pid",
+                        help="Show pid of running daemon")
+    parser.add_argument("-d", "--debug",
+                        action="store",
+                        dest="debug_level",
+                        default=0,
+                        help="Set debug level")
     # TODO expand on the help a little
 
-    (options, args) = parser.parse_args()
-    if options.stop_lock or options.pid:
+    args = parser.parse_args()
+    if args.stop_lock or args.pid:
         pid = getRunningInstances()
         if pid > 0:
-            if options.pid:
+            if args.pid:
                 print "There is an instance of USBlock running with PID: ", pid
-            if options.stop_lock:
+            if args.stop_lock:
                 os.kill(int(pid), signal.SIGTERM)
             sys.exit(0)
         else:
             print "No running USBlock processes."
             sys.exit(0)
 
-    startListening(options)
+    startListening(args)
