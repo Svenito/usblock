@@ -211,14 +211,12 @@ class DeviceAddedListener(object):
         del self.config
         self.config = ConfigParser.ConfigParser()
 
-        i = 1
-        for d in self.devices:
-            section_name = "device%s" % (i)
+        for num, device in enumerate(self.devices, start=1):
+            section_name = "device%s" % num
             self.config.add_section(section_name)
-            self.config.set(section_name, "deviceid", d.uuid)
-            self.config.set(section_name, "devicesize", d.size)
-            self.config.set(section_name, "devicelabel", d.label)
-            i += 1
+            self.config.set(section_name, "deviceid", device.uuid)
+            self.config.set(section_name, "devicesize", device.size)
+            self.config.set(section_name, "devicelabel", device.label)
 
         with open(self.configFile, 'wb') as config_fh:
             self.config.write(config_fh)
@@ -228,10 +226,9 @@ class DeviceAddedListener(object):
         Print all klnown devices to stdout
         """
         print "These are the currently registered devices."
-        i = 1
-        for device in self.devices:
-            print "%d) Label: %s\t\tID: %s" % (i, device.label, device.uuid)
-            i += 1
+
+        for num, device in enumerate(self.devices, start=1):
+            print "%d) Label: %s\t\tID: %s" % (num, device.label, device.uuid)
 
     def addDevice(self, volume):
         """
