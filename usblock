@@ -217,7 +217,7 @@ class DeviceAddedListener(object):
         del self.config
         self.config = ConfigParser.ConfigParser()
 
-        for i, d in enumerate(self.devices):
+        for i, d in enumerate(self.devices, start=1):
             section_name = "device%s" % (i)
             self.config.add_section(section_name)
             self.config.set(section_name, "deviceid", d.uuid)
@@ -233,7 +233,7 @@ class DeviceAddedListener(object):
         """
         print "These are the currently registered devices."
 
-        for i, device in enumerate(self.devices):
+        for i, device in enumerate(self.devices, start=1):
             print "%d) Label: %s\t\tID: %s" % (i, device.label, device.uuid)
 
     def addDevice(self, volume):
