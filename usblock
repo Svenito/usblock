@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 """
     USBLock: manage xlock via usbkeys
@@ -39,7 +39,7 @@ PIDFILE = os.path.join(CONFDIR, 'lock.pid')
 LOGFILE = os.path.join(CONFDIR, 'usblock.log')
 CONFFILE = os.path.join(CONFDIR, 'conf')
 ERRNO_FILE_EXISTS = 17
-VERSION = "0.1"
+__version__ = "0.1"
 
 
 class Device(object):
@@ -176,7 +176,7 @@ class DeviceAddedListener(object):
             os.makedirs(CONFDIR)
         except OSError as e:
             if e.errno != ERRNO_FILE_EXISTS:
-                return -1  
+                return -1
 
         self.configFile = CONFFILE
 
@@ -218,14 +218,12 @@ class DeviceAddedListener(object):
         del self.config
         self.config = ConfigParser.ConfigParser()
 
-        i = 1
-        for d in self.devices:
+        for i, d in enumerate(self.devices, start=1):
             section_name = "device%s" % (i)
             self.config.add_section(section_name)
             self.config.set(section_name, "deviceid", d.uuid)
             self.config.set(section_name, "devicesize", d.size)
             self.config.set(section_name, "devicelabel", d.label)
-            i += 1
 
         with open(self.configFile, 'wb') as config_fh:
             self.config.write(config_fh)
@@ -235,10 +233,9 @@ class DeviceAddedListener(object):
         Print all klnown devices to stdout
         """
         print "These are the currently registered devices."
-        i = 1
-        for device in self.devices:
+
+        for i, device in enumerate(self.devices, start=1):
             print "%d) Label: %s\t\tID: %s" % (i, device.label, device.uuid)
-            i += 1
 
     def addDevice(self, volume):
         """
@@ -393,7 +390,7 @@ def startListening(options):
 if __name__ == '__main__':
     usage = """%s V%s [options]\n
             Lock and unlock your desktop using a USB stick as a key
-            """ % (os.path.basename(sys.argv[0]), VERSION)
+            """ % (os.path.basename(sys.argv[0]), __version__)
     parser = OptionParser(usage=usage)
     parser.add_option("-a", "--add-device",
                       action="store_true",
