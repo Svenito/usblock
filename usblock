@@ -221,7 +221,7 @@ class DeviceAddedListener(object):
 
     def listDevices(self):
         """
-        Print all klnown devices to stdout
+        Print all known devices to stdout
         """
         print "These are the currently registered devices."
 
