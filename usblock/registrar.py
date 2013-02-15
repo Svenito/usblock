@@ -3,6 +3,8 @@ import os
 import ConfigParser
 from collections import namedtuple
 
+from .logger import logger
+
 Device = namedtuple("Device", ["uuid", "size", "label"])
 
 
@@ -35,6 +37,7 @@ class Registrar(object):
         '''Write all current devices stored in memory to config file
         '''
         # Start with a clean config and just dump everything
+        logger.debug("Write out config file")
         del self._config
         self._config = ConfigParser.ConfigParser()
 
