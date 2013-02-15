@@ -7,6 +7,7 @@ import subprocess
 from dbus.mainloop.glib import DBusGMainLoop
 
 from .registrar import Device
+from .logger import logger
 
 
 def queryYesNo(question, default="yes"):
@@ -117,10 +118,11 @@ class LinuxListener(Listener):
     def _add_event(self, udi):
         '''Called when a device is added. Performs validation
         '''
-        print "Device added"
         device = self._get_device(udi)
         if device is None:
             return
+        logger.debug("Device insertion detected %s %s" %
+                     (device.label, device.uuid))
 
         if self._adding_device is True:
             if not self._register_device(device):
@@ -129,8 +131,10 @@ class LinuxListener(Listener):
             return True
 
         if self.registrar.verify_device(device):
+            logger.debug("Device verified OK")
             self._device_udi = udi
             if self._xlock_pid != 0:
+                logger.debug("Unlocking.")
                 os.kill(self._xlock_pid, signal.SIGTERM)
                 self._xlock_pid = 0
 
@@ -142,6 +146,7 @@ class LinuxListener(Listener):
             return
 
         if udi == self._device_udi:
+            logger.debug("Device matches. Locking screen.")
             xlock_proc = subprocess.Popen(['/usr/bin/xlock', '-mode', 'blank'])
             self._xlock_pid = xlock_proc.pid
 
