@@ -48,6 +48,7 @@ class Listener(object):
         self.registrar = registrar
         self._add_device = False
         self._device_udi = None
+        self._adding_device = False
 
     def add_device(self):
         self._adding_device = True
