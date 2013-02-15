@@ -52,6 +52,7 @@ class Listener(object):
 
     def add_device(self):
         self._adding_device = True
+        print "Please (re)insert the device you want to register."
 
     def list_devices(self):
         devices = self.registrar.devices
@@ -63,6 +64,42 @@ class Listener(object):
         for num, device in enumerate(devices, start=1):
             print ("%d) Label: %s\n\t ID: %s" %
                   (num, device.label, device.uuid))
+
+    def remove_device(self):
+        '''List known devices and allow user to select one
+        to remove
+        '''
+        devices = self.registrar.devices
+        if not devices:
+            print "No devices to remove."
+            return
+
+        print "Select a device to remove:"
+        self.list_devices()
+        while True:
+            choice = raw_input("Enter number to remove: ")
+            try:
+                choice = int(choice)
+            except ValueError:
+                print "Invalid choice."
+                continue
+
+            if 0 < choice <= len(devices):
+                if queryYesNo("You are about to remove device %d. Is this OK?"
+                              % (choice)):
+                    del devices[choice - 1]
+            else:
+                print "Invalid choice,"
+                continue
+
+            if not devices:
+                break
+
+            if not queryYesNo("Remove another?"):
+                break
+
+        self.registrar.devices = devices
+        self.registrar.write_config()
 
     def listen(self):
         '''Starts listening for inserted devices
