@@ -1,9 +1,9 @@
 import os
-
 import sys
 import dbus
 import signal
 import gobject
+import subprocess
 from dbus.mainloop.glib import DBusGMainLoop
 
 from .registrar import Device
@@ -46,7 +46,7 @@ class Listener(object):
     def __init__(self, registrar):
         self.registrar = registrar
         self._add_device = False
-        self._device_uid = None
+        self._device_udi = None
 
     def add_device(self):
         self._add_device = True
@@ -135,7 +135,16 @@ class LinuxListener(Listener):
                 self._xlock_pid = 0
 
     def _remove_event(self, udi):
-        print "removed"
+        '''Called when device removed. Starts xlock if not already
+        running
+        '''
+        if self._xlock_pid != 0:
+            return
+
+        if udi == self._device_udi:
+            xlock_proc = subprocess.Popen(['/usr/bin/xlock', '-mode', 'blank'])
+            self._xlock_pid = xlock_proc.pid
+
 
 class MacListener(Listener):
     def __init__(self):
