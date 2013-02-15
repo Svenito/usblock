@@ -48,6 +48,19 @@ class Registrar(object):
         with open(self.path, "w") as config_fh:
             self._config.write(config_fh)
 
+    def add_device(self, device):
+        self.devices.append(device)
+        self.write_config()
+
+    def verify_device(self, device):
+        if device.uuid not in [d.uuid for d in self.devices]:
+            return False
+
+        if str(device.size) not in [d.size for d in self.devices]:
+            return False
+
+        return True
+
     def _create_conf_dir(self):
         '''Create a config dir. Raise Exception if unable to
         create it
