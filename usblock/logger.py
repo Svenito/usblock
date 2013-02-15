@@ -23,4 +23,4 @@ def setup_logging(level, to_file=""):
     h.setFormatter(formatter)
     # add ch to logger
     logger.addHandler(h)
-
+    return h
