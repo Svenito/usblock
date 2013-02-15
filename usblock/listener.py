@@ -49,15 +49,15 @@ class Listener(object):
         self._device_udi = None
 
     def add_device(self):
-        self._add_device = True
+        self._adding_device = True
 
     def listen(self):
         '''Starts listening for inserted devices
         '''
 
-    def _add_device(self, device):
+    def _register_device(self, device):
         if device.uuid in [d.uuid for d in self.registrar.devices]:
-            print ("Device %d with ID %s already registered." %
+            print ("Device %s with ID %s already registered." %
                   (device.label, device.uuid))
             if not queryYesNo("Would you like to add another device?"):
                 return False
@@ -122,8 +122,8 @@ class LinuxListener(Listener):
         if device is None:
             return
 
-        if self._add_device is True:
-            if not self._add_device(device):
+        if self._adding_device is True:
+            if not self._register_device(device):
                 self._loop.quit()
                 return False
             return True
