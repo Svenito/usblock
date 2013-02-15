@@ -53,6 +53,17 @@ class Listener(object):
     def add_device(self):
         self._adding_device = True
 
+    def list_devices(self):
+        devices = self.registrar.devices
+        if not devices:
+            print "There are currently no registered devices."
+            return
+
+        print "These are the currently registered devices:"
+        for num, device in enumerate(devices, start=1):
+            print ("%d) Label: %s\n\t ID: %s" %
+                  (num, device.label, device.uuid))
+
     def listen(self):
         '''Starts listening for inserted devices
         '''
