@@ -23,19 +23,15 @@
 
 import os
 import sys
-import dbus
-import errno
 import signal
-import gobject
-import logging
 from daemonize import Daemonize
-import subprocess
-import ConfigParser
 from argparse import ArgumentParser
-from dbus.mainloop.glib import DBusGMainLoop
-from collections import namedtuple
 
-logger = logging.getLogger("usblock")
+from usblock import listener
+from usblock import registrar
+from usblock import logger
+
+# TODO Set CONFDIR based on OS
 CONFDIR = os.path.expanduser(os.path.join('~', '.config', 'usblock'))
 PIDFILE = os.path.join(CONFDIR, 'lock.pid')
 LOGFILE = os.path.join(CONFDIR, 'usblock.log')
@@ -43,343 +39,57 @@ CONFFILE = os.path.join(CONFDIR, 'conf')
 __version__ = "0.1"
 
 
-Device = namedtuple("Device", ["uuid", "size", "label"])
-
-
-class DeviceAddedListener(object):
-    def __init__(self, options):
-        """
-        Listens for any connected USB storage devices and responds accordingly.
-        Able to add/remove/list known devices and lock/unlock session.
-        """
-        global logger
-        logger.debug("Started pid %s" % os.getpid())
-
-        self.devices = []
-        self.loadConfig()
-
-        if options.remove_device:
-            self.removeDevice()
-            return
-
-        if options.list_devices:
-            self.listDevices()
-            return
-
-        self.add_device = options.add_device
-        if self.add_device:
-            print "Ready to add a new device."
-            print "Insert the device that you want to register..."
-
-        self.xlock_pid = 0
-        self.device_udi = 0
-
-        self.startDBusWatcher()
-        self.loop.run()
-
-    def startDBusWatcher(self):
-        """
-        Starts listening for inserted devices
-        """
-        DBusGMainLoop(set_as_default=True)
-        self.bus = dbus.SystemBus()
-        self.hal_manager_obj = self.bus.get_object(
-            "org.freedesktop.Hal",
-            "/org/freedesktop/Hal/Manager")
-
-        self.hal_manager = dbus.Interface(self.hal_manager_obj,
-                                          "org.freedesktop.Hal.Manager")
-
-        self.hal_manager.connect_to_signal("DeviceAdded", self.addEvent)
-        self.hal_manager.connect_to_signal("DeviceRemoved", self.removeEvent)
-
-        self.loop = gobject.MainLoop()
-
-    def getDevice(self, udi):
-        """
-        Check if device is a volume and return it if it is
-        """
-        device_obj = self.bus.get_object("org.freedesktop.Hal", udi)
-        device = dbus.Interface(device_obj, "org.freedesktop.Hal.Device")
-        if device.QueryCapability("volume"):
-            return device
-
-    def verifyDevice(self, volume):
-        """
-        Compare volume's uuid and size to the list of known devices and
-        return if there is a match
-        """
-        uuid = volume.GetProperty("block.storage_device").split('/')[-1]
-        try:
-            size = volume.GetProperty("volume.size")
-        except:
-            size = 0
-
-        logger.debug("Verifying %s" % uuid)
-        if uuid not in [d.uuid for d in self.devices]:
-            logger.debug("Invalid device (uuid: %s)" % uuid)
-            logger.debug(self.devices)
-            return False
-
-        if str(size) not in [d.size for d in self.devices]:
-            logger.debug("Invalid device (size: %d)" % size)
-            logger.debug(self.devices)
-            return False
-
-        return True
-
-    def addEvent(self, udi):
-        """
-        Called when a device is added. Performs validation
-        """
-        volume = self.getDevice(udi)
-        if volume is None:
-            return
-
-        if self.add_device is True:
-            self.addDevice(volume)
-            return True
-
-        if self.verifyDevice(volume) is True:
-            logger.debug("Device accepted")
-            self.device_udi = udi
-            if self.xlock_pid != 0:
-                os.kill(self.xlock_pid, signal.SIGTERM)
-                self.xlock_pid = 0
-
-    def removeEvent(self, udi):
-        """
-        Called when device removed. Kills xlock if it is running and device
-        is verified
-        """
-        if self.xlock_pid != 0:
-            return
-
-        if cmp(udi, self.device_udi) == 0:
-            logger.debug("Running xlock")
-            # TODO check xlock location or make user configurable
-            xlock_proc = subprocess.Popen(['/usr/bin/xlock', '-mode', 'blank'])
-            self.xlock_pid = xlock_proc.pid
-
-    def loadConfig(self):
-        """
-        Read the current config file
-        """
-        try:
-            os.makedirs(CONFDIR)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                print ("Unable to create config dir %s. %s" %
-                       (CONFDIR, os.strerror(e.errno)))
-                sys.exit(1)
-
-        self.configFile = CONFFILE
-
-        self.config = ConfigParser.ConfigParser()
-        opened_files = self.config.read(self.configFile)
-        if len(opened_files) == 0:
-            try:
-                logger.debug("No conf file to open. Creating one")
-                f = open(self.configFile, 'w+')
-                f.close()
-                os.chmod(self.configFile, 0600)
-            except:
-                return
-        else:
-            self.setValues()
-
-    def setValues(self):
-        """
-        From the config, set list of known devices
-        """
-        if len(self.config.sections()) == 0:
-            logger.debug("No devices")
-            return
-
-        for section in self.config.sections():
-            device = Device(self.config.get(section, "deviceid"),
-                            self.config.get(section, "devicesize"),
-                            self.config.get(section, "devicelabel"))
-            self.devices.append(device)
-
-    def writeConfig(self):
-        """
-        Dump current device list to config file
-        """
-        del self.config
-        self.config = ConfigParser.ConfigParser()
-
-        for num, device in enumerate(self.devices, start=1):
-            section_name = "device%s" % num
-            self.config.add_section(section_name)
-            self.config.set(section_name, "deviceid", device.uuid)
-            self.config.set(section_name, "devicesize", device.size)
-            self.config.set(section_name, "devicelabel", device.label)
-
-        with open(self.configFile, 'wb') as config_fh:
-            self.config.write(config_fh)
-
-    def listDevices(self):
-        """
-        Print all known devices to stdout
-        """
-        print "These are the currently registered devices."
-
-        for num, device in enumerate(self.devices, start=1):
-            print "%d) Label: %s\t\tID: %s" % (num, device.label, device.uuid)
-
-    def addDevice(self, volume):
-        """
-        Add a new device to list of known devices
-        """
-        uuid = volume.GetProperty("block.storage_device").split('/')[-1]
-        size = volume.GetProperty("volume.size")
-        label = volume.GetProperty("volume.label")
-
-        if uuid in [d.uuid for d in self.devices]:
-            print ("Device %s with ID %s already exists in config." %
-                   (label, uuid))
-            if not queryYesNo("Want to add another device?"):
-                self.loop.quit()
-            else:
-                print "Please insert another device..."
-            return
-
-        print ("You are about to add device %s with ID %s and size %s." %
-              (label, uuid, size))
-        if not queryYesNo("Is this OK?"):
-            self.loop.quit()
-            return
-
-        self.devices.append(Device(uuid, size, label))
-        self.writeConfig()
-
-        print "Device added successfully."
-        self.loop.quit()
-
-    def removeDevice(self):
-        """
-        List known devices and allow user to remove one
-        """
-        if len(self.devices) == 0:
-            print "No devices to to remove"
-            return
-
-        print "Select a device to remove:"
-        self.listDevices()
-        while True:
-            choice = raw_input("Enter number to remove: ")
-            try:
-                choice = int(choice)
-            except ValueError:
-                print "Invalid choice."
-                continue
-
-            if 0 < choice <= len(self.devices):
-                if queryYesNo("You are about to remove device %d. Is this OK?"
-                              % (choice)):
-                    del self.devices[choice - 1]
-                    self.writeConfig()
-            else:
-                print "Invalid choice,"
-                continue
-
-            if len(self.devices) == 0:
-                break
-
-            if not queryYesNo("Remove another?"):
-                break
-
-
-def queryYesNo(question, default="yes"):
-    """Ask a yes/no question via raw_input() and return their answer.
-
-    "question" is a string that is presented to the user.
-    "default" is the presumed answer if the user just hits <Enter>.
-        It must be "yes" (the default), "no" or None (meaning
-        an answer is required of the user).
-
-    The "answer" return value is one of "yes" or "no".
-    """
-    valid = {"yes": True, "y": True, "ye": True,
-             "no": False, "n": False}
-    if default is None:
-        prompt = " [y/n] "
-    elif cmp(default, "yes") == 0:
-        prompt = " [Y/n] "
-    elif cmp(default, "no") == 0:
-        prompt = " [y/N] "
-    else:
-        raise ValueError("invalid default answer: '%s'" % default)
-
-    while True:
-        sys.stdout.write(question + prompt)
-        choice = raw_input().lower()
-        if default is not None and choice == '':
-            return valid[default]
-        elif choice in valid:
-            return valid[choice]
-        else:
-            sys.stdout.write("Please respond with 'yes' or 'no' "
-                             "(or 'y' or 'n').\n")
-
-
-def setupLogging(level, to_file=False):
-    if level > 5:
-        level = 5
-
-    level *= 10
-    logger.setLevel(level)
-
-    # create console handler and set level to debug
-    if to_file is True:
-        h = logging.FileHandler(LOGFILE)
-    else:
-        h = logging.StreamHandler()
-    h.setLevel(level)
-    # create formatter
-    formatter = logging.Formatter("%(asctime)s - %(name)s - "
-                                  "%(levelname)s -%(message)s")
-    # add formatter to ch
-    h.setFormatter(formatter)
-    # add ch to logger
-    logger.addHandler(h)
-    return h
-
-
-def getRunningInstances():
+def get_running_instances():
+    '''Get the pid from the pidfile and return it.
+    Return 0 if no pidfile found
+    '''
     try:
-        with open(PIDFILE) as file:
-            pid = file.readline()
-            return pid
+        with open(PIDFILE) as pidfile:
+            usblock_pid = pidfile.readline()
+            return usblock_pid
     except IOError:
         return 0
 
 
-def doit():
-    DeviceAddedListener(args)
+def run_listener(options):
+    '''Setup registrar and listener and run as needed
+    by options
+    '''
+    logger.setup_logging(options.debug_level)
 
+    reg = registrar.Registrar(CONFFILE)
+    reg.load_config()
 
-def startListening(options):
-    fg = [n for n, v in options.__dict__.items()
-          if (v is not False and n != "debug_level")]
+    listen = listener.LinuxListener(reg)
 
-    to_file = False
-    if len(fg) == 0:
-        if getRunningInstances() > 0:
+    if options.remove_device:
+        listen.remove_device()
+        return
+
+    if options.list_devices:
+        listen.list_devices()
+        return
+
+    if options.add_device:
+        listen.add_device()
+        listen.listen()
+        return
+
+    if options.foreground:
+        listen.listen()
+    else:
+        if get_running_instances() > 0:
             print "USBlock is already running"
             sys.exit(0)
-        to_file = True
-        fh = setupLogging(int(options.debug_level), to_file)
+
+        to_file = LOGFILE
+        file_handle = logger.setup_logging(options.debug_level, to_file)
 
         daemon = Daemonize(app="usblock",
                            pid=PIDFILE,
-                           action=doit,
-                           keep_fds=[fh.stream.fileno()])
+                           action=listen.listen,
+                           keep_fds=[file_handle.stream.fileno()])
         daemon.start()
-
-    setupLogging(int(options.debug_level), to_file)
-    DeviceAddedListener(options)
 
 
 if __name__ == '__main__':
@@ -421,7 +131,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     if args.stop_lock or args.pid:
-        pid = getRunningInstances()
+        pid = get_running_instances()
         if pid > 0:
             if args.pid:
                 print "There is an instance of USBlock running with PID: ", pid
@@ -432,4 +142,4 @@ if __name__ == '__main__':
             print "No running USBlock processes."
             sys.exit(0)
 
-    startListening(args)
+    run_listener(args)
