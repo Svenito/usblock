@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Usblock by Svenito</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Usblock</h1>
+        <p class="header">Lock and unlock your desktop using a USB stick as a key</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/Svenito/usblock/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/Svenito/usblock/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/Svenito/usblock">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/Svenito">Svenito</a></p>
+
+
+      </header>
+      <section>
+        <h1></h1>
+
+<h1>USBLock</h1>
+
+<p>Copyright (C) 2013  Sven Steinbauer <a href="http://www.unlogic.co.uk">http://www.unlogic.co.uk</a></p>
+
+<p>USBlock is a Python script that will lock and unlock your linux box using any 
+old USB storage device as a key.</p>
+
+<p>** NOTE **
+V0.1 only works on Linux. OS X and Windows will have to wait a little.</p>
+
+<h1>Non Python dependencies</h1>
+
+<h2>Linux</h2>
+
+<p>You will need <code>dbus</code> and <code>python-dbus</code> as well as <code>hal</code>. These should all be 
+available via your package manager. See below why <code>python-dbus</code> is listed here.</p>
+
+<h1>Known Issues</h1>
+
+<ul>
+<li><p>I've had some devices not mount on external USB ports (like on a Mac keyboard
+or hub). DBus does not register the device insertion and so USBLock cannot
+lock or unlock your machine. Try a different memory stick or USB port.</p></li>
+<li><p>On linux you need dbus installed. <code>pip install dbus-python</code> doesn't work, so 
+you may have to install it via your system's package manager or from source.</p></li>
+</ul><h1>Thanks for the patches</h1>
+
+<p>Joel Semar, Natan L</p>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
