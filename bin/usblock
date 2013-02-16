@@ -41,7 +41,7 @@ else:
 PIDFILE = os.path.join(CONFDIR, 'lock.pid')
 LOGFILE = os.path.join(CONFDIR, 'usblock.log')
 CONFFILE = os.path.join(CONFDIR, 'conf')
-__version__ = "0.1.0"
+__version__ = "0.1"
 
 
 def get_running_instances():

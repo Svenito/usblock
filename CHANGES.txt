@@ -1,1 +1,3 @@
-v0.1, 15/02/2013 -- Initial release
+v0.1.0, 15/02/2013 -- Initial release
+v0.1.1, 16/02/2013 -- Fix typo in package description
+v0.1.2, 16/02/2013 -- setup.py fix usblock filename in bin
