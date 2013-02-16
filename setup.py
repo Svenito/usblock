@@ -2,14 +2,14 @@ from distutils.core import setup
 
 setup(
     name='USBLock',
-    version='0.1.6',
+    version='0.1.7',
     author='Sven Steinbauer',
     author_email='sven@unlogic.co.uk',
     maintainer='Sven Steinbauer',
     packages=['usblock'],
     scripts=['bin/usblock'],
     url='https://github.com/Svenito/usblock',
-    license='GLP3',
+    license='GPL3',
     description='Lock and unlock your desktop using a USB stick as a key.',
     long_description=open('README.txt').read(),
     install_requires=[
