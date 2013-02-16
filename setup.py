@@ -2,14 +2,14 @@ from distutils.core import setup
 
 setup(
     name='USBLock',
-    version='0.1.0',
+    version='0.1.1',
     author='Sven Steinbauer',
     author_email='sven@unlogic.co.uk',
     packages=['usblock'],
     scripts=['bin/usblock.py'],
     url='http://pypi.python.org/pypi/USBLock',
     license='LICENSE.txt',
-    description='Lock and unlock you desktop using a USB stick as a key.',
+    description='Lock and unlock your desktop using a USB stick as a key.',
     long_description=open('README.txt').read(),
     install_required=[
         "daemonize==2.1.1",
