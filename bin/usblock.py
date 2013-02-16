@@ -32,11 +32,16 @@ from usblock import registrar
 from usblock import logger
 
 # TODO Set CONFDIR based on OS
-CONFDIR = os.path.expanduser(os.path.join('~', '.config', 'usblock'))
+if sys.platform.startswith("linux"):
+    CONFDIR = os.path.expanduser(os.path.join('~', '.config', 'usblock'))
+else:
+    print "Your platform is currently not supported. Working on it though"
+    sys.exit(0)
+
 PIDFILE = os.path.join(CONFDIR, 'lock.pid')
 LOGFILE = os.path.join(CONFDIR, 'usblock.log')
 CONFFILE = os.path.join(CONFDIR, 'conf')
-__version__ = "0.1"
+__version__ = "0.1.0"
 
 
 def get_running_instances():
@@ -60,7 +65,11 @@ def run_listener(options):
     reg = registrar.Registrar(CONFFILE)
     reg.load_config()
 
-    listen = listener.LinuxListener(reg)
+    if sys.platform.startswith("linux"):
+        listen = listener.LinuxListener(reg)
+    else:
+        print "Your platform is currently not supported. Working on it though"
+        sys.exit(0)
 
     if options.remove_device:
         listen.remove_device()
