@@ -4,6 +4,7 @@ logger = logging.getLogger("usblock")
 
 
 def setup_logging(level, to_file=""):
+    level = int(level)
     if level > 5:
         level = 5
 
