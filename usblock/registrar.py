@@ -9,10 +9,12 @@ Device = namedtuple("Device", ["uuid", "size", "label"])
 
 
 class Registrar(object):
+    '''Handles reading and writing device details to the
+    config file'''
     def __init__(self, path=""):
-        self.path = path
         self.devices = []
 
+        self._path = path
         self._config = None
 
     def load_config(self):
@@ -21,11 +23,11 @@ class Registrar(object):
         '''
         self._create_conf_dir()
         self._config = ConfigParser.ConfigParser()
-        opened_files = self._config.read(self.path)
+        opened_files = self._config.read(self._path)
         if not len(opened_files):
             try:
-                f = open(self._path, "w+")
-                f.close()
+                file_handle = open(self._path, "w+")
+                file_handle.close()
                 os.chmod(self._path, 0600)
             except:
                 raise Exception("Failed to open %s for writing." %
@@ -48,14 +50,19 @@ class Registrar(object):
             self._config.set(section_name, "devicesize", device.size)
             self._config.set(section_name, "devicelabel", device.label)
 
-        with open(self.path, "w") as config_fh:
+        with open(self._path, "w") as config_fh:
             self._config.write(config_fh)
 
     def add_device(self, device):
+        '''Adds a device to the list and writes the new config
+        '''
         self.devices.append(device)
         self.write_config()
 
     def verify_device(self, device):
+        '''Checks supplied device against known devices. Returns
+        True if a match is found, False otherwise
+        '''
         if device.uuid not in [d.uuid for d in self.devices]:
             return False
 
@@ -69,11 +76,11 @@ class Registrar(object):
         create it
         '''
         try:
-            os.makedirs(self.path)
+            os.makedirs(self._path)
         except OSError as err:
             if err.errno != errno.EEXIST:
                 raise Exception("Unable to create config dir %s %s" %
-                                (self.path, os.strerror(err.errno)))
+                                (self._path, os.strerror(err.errno)))
 
     def _set_values(self):
         '''Set up devices for current config

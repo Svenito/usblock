@@ -10,7 +10,7 @@ from .registrar import Device
 from .logger import logger
 
 
-def queryYesNo(question, default="yes"):
+def query_yes_no(question, default="yes"):
     """Ask a yes/no question via raw_input() and return their answer.
 
     "question" is a string that is presented to the user.
@@ -44,6 +44,9 @@ def queryYesNo(question, default="yes"):
 
 
 class Listener(object):
+    '''Base class that listens to device insertion and removal
+    and manages device adding/removing
+    '''
     def __init__(self, registrar):
         self.registrar = registrar
         self._add_device = False
@@ -51,10 +54,14 @@ class Listener(object):
         self._adding_device = False
 
     def add_device(self):
+        '''Begin adding a device procedure
+        '''
         self._adding_device = True
         print "Please (re)insert the device you want to register."
 
     def list_devices(self):
+        '''List all registered devices
+        '''
         devices = self.registrar.devices
         if not devices:
             print "There are currently no registered devices."
@@ -85,8 +92,8 @@ class Listener(object):
                 continue
 
             if 0 < choice <= len(devices):
-                if queryYesNo("You are about to remove device %d. Is this OK?"
-                              % (choice)):
+                if query_yes_no("You are about to remove device %d. Is this OK?"
+                                % (choice)):
                     del devices[choice - 1]
             else:
                 print "Invalid choice,"
@@ -95,7 +102,7 @@ class Listener(object):
             if not devices:
                 break
 
-            if not queryYesNo("Remove another?"):
+            if not query_yes_no("Remove another?"):
                 break
 
         self.registrar.devices = devices
@@ -103,13 +110,17 @@ class Listener(object):
 
     def listen(self):
         '''Starts listening for inserted devices
+        Needs to be implemented in derived class
         '''
 
     def _register_device(self, device):
+        '''Take device details of inserted device and guide user
+        through adding it to known devices
+        '''
         if device.uuid in [d.uuid for d in self.registrar.devices]:
             print ("Device %s with ID %s already registered." %
                   (device.label, device.uuid))
-            if not queryYesNo("Would you like to add another device?"):
+            if not query_yes_no("Would you like to add another device?"):
                 return False
             else:
                 print "Please insert another device."
@@ -118,7 +129,7 @@ class Listener(object):
         print ("You are about to add device %s with ID %s." %
               (device.label, device.uuid))
 
-        if not queryYesNo("Is this OK?"):
+        if not query_yes_no("Is this OK?"):
             return False
 
         self.registrar.add_device(device)
@@ -128,6 +139,9 @@ class Listener(object):
 
 
 class LinuxListener(Listener):
+    '''Specialised listener for Linux based systems that support
+    dbus implementation
+    '''
     def __init__(self, registrar):
         super(LinuxListener, self).__init__(registrar)
         self._loop = None

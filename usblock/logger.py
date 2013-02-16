@@ -13,15 +13,15 @@ def setup_logging(level, to_file=""):
 
     # create console handler and set level to debug
     if to_file:
-        h = logging.FileHandler(to_file)
+        handler = logging.FileHandler(to_file)
     else:
-        h = logging.StreamHandler()
-    h.setLevel(level)
+        handler = logging.StreamHandler()
+    handler.setLevel(level)
     # create formatter
     formatter = logging.Formatter("%(asctime)s - %(name)s - "
                                   "%(levelname)s -%(message)s")
     # add formatter to ch
-    h.setFormatter(formatter)
+    handler.setFormatter(formatter)
     # add ch to logger
-    logger.addHandler(h)
-    return h
+    logger.addHandler(handler)
+    return handler
