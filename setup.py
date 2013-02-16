@@ -2,11 +2,11 @@ from distutils.core import setup
 
 setup(
     name='USBLock',
-    version='0.1.1',
+    version='0.1.2',
     author='Sven Steinbauer',
     author_email='sven@unlogic.co.uk',
     packages=['usblock'],
-    scripts=['bin/usblock.py'],
+    scripts=['bin/usblock'],
     url='http://pypi.python.org/pypi/USBLock',
     license='LICENSE.txt',
     description='Lock and unlock your desktop using a USB stick as a key.',
