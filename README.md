@@ -10,6 +10,15 @@ old USB storage device as a key.
 ** NOTE **
 V0.1 only works on Linux. OS X and Windows will have to wait a little.
 
+Non Python dependencies
+=======================
+
+Linux
+-----
+
+You will need `dbus` and `python-dbus` as well as `hal`. These should all be 
+available via your package manager. See below why `python-dbus` is listed here.
+
 Known Issues
 ============
 
