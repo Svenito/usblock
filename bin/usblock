@@ -35,7 +35,7 @@ from usblock import logger
 if sys.platform.startswith("linux"):
     CONFDIR = os.path.expanduser(os.path.join('~', '.config', 'usblock'))
 else:
-    print "Your platform is currently not supported. Working on it though"
+    print("Your platform is currently not supported. Working on it though")
     sys.exit(0)
 
 PIDFILE = os.path.join(CONFDIR, 'lock.pid')
@@ -68,7 +68,7 @@ def run_listener(options):
     if sys.platform.startswith("linux"):
         listen = listener.LinuxListener(reg)
     else:
-        print "Your platform is currently not supported. Working on it though"
+        print("Your platform is currently not supported. Working on it though")
         sys.exit(0)
 
     if options.remove_device:
@@ -88,7 +88,7 @@ def run_listener(options):
         listen.listen()
     else:
         if get_running_instances() > 0:
-            print "USBlock is already running"
+            print("USBlock is already running")
             sys.exit(0)
 
         to_file = LOGFILE
@@ -143,12 +143,12 @@ if __name__ == '__main__':
         pid = get_running_instances()
         if pid > 0:
             if args.pid:
-                print "There is an instance of USBlock running with PID: ", pid
+                print("There is an instance of USBlock running with PID: ", pid)
             if args.stop_lock:
                 os.kill(int(pid), signal.SIGTERM)
             sys.exit(0)
         else:
-            print "No running USBlock processes."
+            print("No running USBlock processes.")
             sys.exit(0)
 
     run_listener(args)

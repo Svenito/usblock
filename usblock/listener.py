@@ -57,17 +57,17 @@ class Listener(object):
         '''Begin adding a device procedure
         '''
         self._adding_device = True
-        print "Please (re)insert the device you want to register."
+        print("Please (re)insert the device you want to register.")
 
     def list_devices(self):
         '''List all registered devices
         '''
         devices = self.registrar.devices
         if not devices:
-            print "There are currently no registered devices."
+            print("There are currently no registered devices.")
             return
 
-        print "These are the currently registered devices:"
+        print("These are the currently registered devices:")
         for num, device in enumerate(devices, start=1):
             print ("%d) Label: %s\n\t ID: %s" %
                   (num, device.label, device.uuid))
@@ -78,17 +78,17 @@ class Listener(object):
         '''
         devices = self.registrar.devices
         if not devices:
-            print "No devices to remove."
+            print("No devices to remove.")
             return
 
-        print "Select a device to remove:"
+        print("Select a device to remove:")
         self.list_devices()
         while True:
             choice = raw_input("Enter number to remove: ")
             try:
                 choice = int(choice)
             except ValueError:
-                print "Invalid choice."
+                print("Invalid choice.")
                 continue
 
             if 0 < choice <= len(devices):
@@ -96,7 +96,7 @@ class Listener(object):
                                 % (choice)):
                     del devices[choice - 1]
             else:
-                print "Invalid choice,"
+                print("Invalid choice,")
                 continue
 
             if not devices:
@@ -123,7 +123,7 @@ class Listener(object):
             if not query_yes_no("Would you like to add another device?"):
                 return False
             else:
-                print "Please insert another device."
+                print("Please insert another device.")
             return True
 
         print ("You are about to add device %s with ID %s." %
@@ -134,7 +134,7 @@ class Listener(object):
 
         self.registrar.add_device(device)
 
-        print "Device added successfully."
+        print("Device added successfully.")
         return False
 
 
