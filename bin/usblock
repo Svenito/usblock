@@ -88,7 +88,10 @@ def run_listener(options):
         listen.listen()
     else:
         if get_running_instances() > 0:
-            print("USBlock is already running")
+            print("Found a pid file for USBlock so it might be running "
+                  "with pid %s. If not, please delete the file %s "
+                  "and run USBLock again. " %
+                  (get_running_instances(), PIDFILE))
             sys.exit(0)
 
         to_file = LOGFILE
