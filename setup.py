@@ -11,7 +11,7 @@ setup(
     url='https://github.com/Svenito/usblock',
     license='GPL3',
     description='Lock and unlock your desktop using a USB stick as a key.',
-    long_description=open('README.txt').read(),
+    long_description=open('README.md').read(),
     install_requires=[
         "daemonize==2.1.1",
         "argparse==1.2.1",
