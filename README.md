@@ -12,6 +12,14 @@ old USB storage device as a key.
 ** NOTE **
 V0.1 only works on Linux. OS X and Windows will have to wait a little.
 
+Installation
+============
+
+Install with `pip install usblock` or run `sudo python ./setup.py install` 
+from the directory you downloaded USBLock into.
+
+See `requirements.txt` for a list of required Python modules.
+
 Non Python dependencies
 =======================
 
