@@ -29,7 +29,7 @@ class Registrar(object):
                 file_handle = open(self._path, "w+")
                 file_handle.close()
                 os.chmod(self._path, 0600)
-            except:
+            except IOError:
                 raise Exception("Failed to open %s for writing." %
                                 self._path)
         else:
