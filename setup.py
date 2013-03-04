@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='USBLock',
-    version='0.2.1',
+    version='0.2.2',
     author='Sven Steinbauer',
     author_email='sven@unlogic.co.uk',
     maintainer='Sven Steinbauer',

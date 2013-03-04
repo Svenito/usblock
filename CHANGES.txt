@@ -7,3 +7,4 @@ v0.2.0, 24/02/2013 -- Add --restart option to restart daemon and reload config
                         Add nose tests and Travis support
 v0.2.1, 03/03/2013 -- Fix requires directive in setup.py
                         improved exception handling in Registrar
+v0.2.2, 04/03/2012 -- fix setup file with correct README file
