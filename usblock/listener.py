@@ -224,13 +224,25 @@ class MacListener(Listener):
     def __init__(self, registrar):
         super(MacListener, self).__init__(registrar)
         self.notifCenter = NSWorkspace.sharedWorkspace().notificationCenter()
-        self.notifCenter.addObserver_selector_name_object_(self, 'insert:', NSWorkspaceDidMountNotification, None)
+        self.notifCenter.addObserver_selector_name_object_(self,
+                                                           '_add_event',
+                                                           NSWorkspaceDidMountNotification,
+                                                           None)
+        self.notifCenter.addObserver_selector_name_object_(self,
+                                                           '_remove_event',
+                                                           NSWorkspaceDidUnmountNotification,
+                                                           None)
 
     def listen(self):
         print "listening"
+        app = NSApplication.sharedApplication()
+        app.run()
 
-    def insert(self):
+    def _add_event(self):
         print "Inserted"
+
+    def _remove_event(self):
+        print "removed"
 
 
 class WinListener(Listener):
