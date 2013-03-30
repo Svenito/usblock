@@ -29,6 +29,14 @@ Linux
 You will need `dbus` and `python-dbus` as well as `hal`. These should all be 
 available via your package manager. See below why `python-dbus` is listed here.
 
+OS X
+----
+
+On OSX you will need to install `pyobjc` which takes two steps
+
+  $> pip install pyobjc-core
+  $> pip install pyobjc
+
 Known Issues
 ============
 
@@ -38,6 +46,10 @@ lock or unlock your machine. Try a different memory stick or USB port.
 
 * On linux you need dbus installed. `pip install dbus-python` doesn't work, so 
 you may have to install it via your system's package manager or from source.
+
+See this Stackoverflow post for more information
+
+http://stackoverflow.com/questions/13365697/install-python-dbus-in-virtualenv
 
 Thanks for the patches
 ======================

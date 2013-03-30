@@ -1,10 +1,16 @@
 import os
 import sys
-import dbus
 import signal
-import gobject
 import subprocess
-from dbus.mainloop.glib import DBusGMainLoop
+
+if sys.platform.startswith("linux"):
+    import dbus
+    import gobject
+    from dbus.mainloop.glib import DBusGMainLoop
+elif sys.platform.startswith("darwin"):
+    import objc
+    from AppKit import *
+    from Foundation import *
 
 from .registrar import Device
 from .logger import logger
@@ -215,8 +221,16 @@ class LinuxListener(Listener):
 
 
 class MacListener(Listener):
-    def __init__(self):
-        raise Exception("MacListener not yet implemented")
+    def __init__(self, registrar):
+        super(MacListener, self).__init__(registrar)
+        self.notifCenter = NSWorkspace.sharedWorkspace().notificationCenter()
+        self.notifCenter.addObserver_selector_name_object_(self, 'insert:', NSWorkspaceDidMountNotification, None)
+
+    def listen(self):
+        print "listening"
+
+    def insert(self):
+        print "Inserted"
 
 
 class WinListener(Listener):
