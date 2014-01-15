@@ -76,7 +76,7 @@ class Registrar(object):
         create it
         '''
         try:
-            os.makedirs(self._path)
+            os.makedirs(os.path.dirname(self._path))
         except OSError as err:
             if err.errno != errno.EEXIST:
                 raise Exception("Unable to create config dir %s %s" %
